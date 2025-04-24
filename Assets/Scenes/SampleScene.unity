@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: -0.301505, z: -2.816806}
+  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -466,8 +466,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 447623302}
-  m_LocalRotation: {x: 0.0045975484, y: 0.000000017208299, z: -7.911682e-11, w: 0.99998945}
-  m_LocalPosition: {x: 0, y: 1.69, z: -3.54}
+  m_LocalRotation: {x: 0.004583946, y: -0.034421083, z: 0.00015787955, w: 0.9993969}
+  m_LocalPosition: {x: 0.6, y: 1.69, z: -3.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1045,8 +1045,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.0045975484, y: 0.000000017208299, z: -7.911682e-11, w: 0.99998945}
-  m_LocalPosition: {x: -11.049955, y: -35.084507, z: -39.323025}
+  m_LocalRotation: {x: 0.004583946, y: -0.034421083, z: 0.00015787955, w: 0.9993969}
+  m_LocalPosition: {x: -10.449955, y: -35.084507, z: -39.323025}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1072,8 +1072,8 @@ MonoBehaviour:
   m_UpdateMethod: 2
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
-    m_Style: 1
-    m_Time: 1
+    m_Style: 0
+    m_Time: 0.09
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -1415,7 +1415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: -0.301505, z: -2.816806}
+  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -1778,7 +1778,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 1
-  m_FollowOffset: {x: 0, y: 0.68, z: -3.54}
+  m_FollowOffset: {x: 0.6, y: 0.68, z: -3.54}
   m_XDamping: 0.3
   m_YDamping: 0.3
   m_ZDamping: 0.3
@@ -2019,7 +2019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: -0.301505, z: -2.816806}
+  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -2287,6 +2287,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerAnimator: {fileID: 805186837223526302}
   _speedName: Speed
+  _xVelocityName: X_Velocity
+  _yVelocityName: Y_Velocity
+  _focusName: CanFocus
 --- !u!1 &902608086829885071
 GameObject:
   m_ObjectHideFlags: 0

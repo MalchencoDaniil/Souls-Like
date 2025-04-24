@@ -18,7 +18,7 @@ namespace Gameplay.Player
         [SerializeField]
         private Transform _target;
 
-        private Vector3 _movementDirection;
+        private Vector3 _movementDirection, _currentVelocity;
 
         [Header("Movement Stats")]
         [SerializeField, Range(5, 8)]
@@ -68,14 +68,15 @@ namespace Gameplay.Player
 
         private void Update()
         {
-            Debug.Log(_playerInput.MovementInput());
-
             Vector3 _movementInput = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * new Vector3(_playerInput.MovementInput().x, 0, _playerInput.MovementInput().y);
             _movementDirection = _movementInput.normalized;
 
             if (_playerInput.SwitchMoveType()) SwitchCamera();
 
             MovementType();
+
+            _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, _playerInput.MovementInput().x * _movementSpeed, 8.9f * Time.deltaTime);
+            _currentVelocity.y = Mathf.Lerp(_currentVelocity.y, _playerInput.MovementInput().y * _movementSpeed, 8.9f * Time.deltaTime);
 
             _playerAnimator.Move(_movementDirection);
 
@@ -98,6 +99,8 @@ namespace Gameplay.Player
 
             if (!_canTPS)
             {
+                _playerAnimator.VelocityWalkBlend(_currentVelocity);
+
                 Vector3 _direction = _target.position - transform.position;
                 _direction.y = 0;
                 Quaternion _rotation = Quaternion.LookRotation(_direction);
@@ -112,8 +115,12 @@ namespace Gameplay.Player
             _tpsCamera.gameObject.SetActive(_canTPS);
             _focusCamera.gameObject.SetActive(!_canTPS);
 
+            if (_canTPS) _playerAnimator.ExitFocusAnim();
+
             if (!_canTPS)
             {
+                _playerAnimator.EnterFocusAnim();
+
                 _tpsCamera.Follow = _focusCamera.Follow;
                 _tpsCamera.LookAt = _focusCamera.LookAt;
             }
