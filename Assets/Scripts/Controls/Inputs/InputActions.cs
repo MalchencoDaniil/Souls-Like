@@ -107,6 +107,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Focus"",
+                    ""type"": ""Button"",
+                    ""id"": ""457f4673-6c03-4d55-8421-1d5c4b530a4d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -118,6 +127,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""07004310-a2ed-449b-b0a0-2cdb9fe9672f"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Focus"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -132,6 +152,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_Look = m_Camera.FindAction("Look", throwIfNotFound: true);
+        m_Camera_Focus = m_Camera.FindAction("Focus", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -225,11 +246,13 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Camera;
     private ICameraActions m_CameraActionsCallbackInterface;
     private readonly InputAction m_Camera_Look;
+    private readonly InputAction m_Camera_Focus;
     public struct CameraActions
     {
         private @InputActions m_Wrapper;
         public CameraActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Look => m_Wrapper.m_Camera_Look;
+        public InputAction @Focus => m_Wrapper.m_Camera_Focus;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -242,6 +265,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Look.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnLook;
+                @Focus.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFocus;
+                @Focus.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFocus;
+                @Focus.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFocus;
             }
             m_Wrapper.m_CameraActionsCallbackInterface = instance;
             if (instance != null)
@@ -249,6 +275,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
+                @Focus.started += instance.OnFocus;
+                @Focus.performed += instance.OnFocus;
+                @Focus.canceled += instance.OnFocus;
             }
         }
     }
@@ -260,5 +289,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     public interface ICameraActions
     {
         void OnLook(InputAction.CallbackContext context);
+        void OnFocus(InputAction.CallbackContext context);
     }
 }
