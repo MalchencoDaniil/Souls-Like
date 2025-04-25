@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 7860.2188, g: 8495.453, b: 9631.4375, a: 1}
+  m_IndirectSpecularColor: {r: 7851.203, g: 8421.328, b: 9235.016, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
+  m_FollowOffset: {x: 0, y: -0.3339427, z: -2.064508}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -1415,7 +1415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
+  m_FollowOffset: {x: 0, y: -0.3339427, z: -2.064508}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -1712,6 +1712,7 @@ MonoBehaviour:
   _playerAnimator: {fileID: 805186837223526303}
   _target: {fileID: 1386546915}
   _movementSpeed: 6
+  _dashLength: 2
   _rotationSpeed: 15
   _groundDistance: 0.1
   _whatIsGround:
@@ -1781,7 +1782,7 @@ MonoBehaviour:
   m_FollowOffset: {x: 0.6, y: 0.68, z: -3.54}
   m_XDamping: 0.3
   m_YDamping: 0.3
-  m_ZDamping: 0.3
+  m_ZDamping: 2
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -2019,7 +2020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 0
-  m_FollowOffset: {x: 0, y: 0.626173, z: -3.495575}
+  m_FollowOffset: {x: 0, y: -0.3339427, z: -2.064508}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -2244,7 +2245,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 29072758318503207}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalPosition: {x: 0, y: -1.09, z: 0}
   m_LocalScale: {x: 0.0041378243, y: 0.0041378243, z: 0.0041378243}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2290,6 +2291,7 @@ MonoBehaviour:
   _xVelocityName: X_Velocity
   _yVelocityName: Y_Velocity
   _focusName: CanFocus
+  _rolling: CanRoll
 --- !u!1 &902608086829885071
 GameObject:
   m_ObjectHideFlags: 0

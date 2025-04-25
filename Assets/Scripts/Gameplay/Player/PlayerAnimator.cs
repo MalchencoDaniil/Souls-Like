@@ -22,6 +22,9 @@ namespace Gameplay.Player
         [SerializeField]
         private string _focusName = "CanFocus";
 
+        [SerializeField]
+        private string _rolling = "CanRoll";
+
         private void Start()
         {
             _xVelHash = Animator.StringToHash(_xVelocityName);
@@ -37,6 +40,11 @@ namespace Gameplay.Player
         {
             Debug.Log("EnterFocusAnim");
             _playerAnimator.SetBool(_focusName, true);
+        }
+
+        internal void Roll()
+        {
+            _playerAnimator.SetTrigger(_rolling);
         }
 
         internal void ExitFocusAnim()

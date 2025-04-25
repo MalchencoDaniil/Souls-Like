@@ -1,4 +1,6 @@
 using Cinemachine;
+using Cysharp.Threading.Tasks;
+using System.Linq;
 using UnityEngine;
 
 namespace Gameplay.Player
@@ -6,6 +8,8 @@ namespace Gameplay.Player
     [RequireComponent(typeof(CharacterController))]
     public class Movement : MonoBehaviour
     {
+        private bool _canRoll = false;
+
         private float _currentSpeed;
 
         internal CharacterController _characterController;
@@ -23,6 +27,9 @@ namespace Gameplay.Player
         [Header("Movement Stats")]
         [SerializeField, Range(5, 8)]
         private float _movementSpeed = 4;
+
+        [SerializeField]
+        private float _dashLength = 2;
 
         [SerializeField]
         private float _rotationSpeed = 15f;
@@ -71,23 +78,97 @@ namespace Gameplay.Player
             Vector3 _movementInput = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * new Vector3(_playerInput.MovementInput().x, 0, _playerInput.MovementInput().y);
             _movementDirection = _movementInput.normalized;
 
-            if (_playerInput.SwitchMoveType()) SwitchCamera();
+            if (!_canRoll)
+            {
+                if (_playerInput.SwitchMoveType()) SwitchCamera();
+                MovementType();
 
-            MovementType();
+                _characterController.Move(_movementDirection * _movementSpeed * Time.deltaTime);
+            }
 
             _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, _playerInput.MovementInput().x * _movementSpeed, 8.9f * Time.deltaTime);
             _currentVelocity.y = Mathf.Lerp(_currentVelocity.y, _playerInput.MovementInput().y * _movementSpeed, 8.9f * Time.deltaTime);
 
             _playerAnimator.Move(_movementDirection);
 
-            _characterController.Move(_movementDirection * _movementSpeed * Time.deltaTime);
+            StartRoll();
         }
+
+        private async void StartRoll()
+        {
+            if (_playerInput.RollInputEvent() && IsGrounded() && !_canRoll)
+            {
+                _canRoll = false;
+
+                Vector3 _rollDirection;
+
+                if (_canTPS)
+                {
+                    _rollDirection = transform.forward;
+                }
+                else
+                {
+                    _rollDirection = CalculateRollDirection(_movementDirection);
+                }
+
+                await Rolling(_rollDirection);
+            }
+        }
+
+
+        private Vector3 CalculateRollDirection(Vector3 _direction)
+        {
+            Vector3 _rollDirection;
+
+            if (_direction == Vector3.zero)
+            {
+                _rollDirection = _focusCamera.transform.forward;
+            }
+            else
+            {
+                _rollDirection = Vector3.Lerp(_focusCamera.transform.forward, _direction, 0.5f).normalized;
+            }
+
+            return _rollDirection;
+        }
+
 
         private void MovementType()
         {
             PlayerRotate();
 
             _movementSpeed = _canTPS ? _currentSpeed : _currentSpeed / 2;
+        }
+
+        private async UniTask Rolling(Vector3 _direction)
+        {
+            _canRoll = true;
+
+            Vector3 _rollDirection = _direction.normalized;
+
+            if (_rollDirection == Vector3.zero)
+                _rollDirection = transform.forward;
+
+            AnimationClip _rollClip = _playerAnimator._playerAnimator.runtimeAnimatorController.animationClips.FirstOrDefault(c => c.name == "Roll");
+
+            _playerAnimator.Roll();
+
+            float _rollDuration = _rollClip.length;
+
+            float _startTime = Time.time;
+
+            while (Time.time < _startTime + _rollDuration)
+            {
+                float _timeElapsed = Time.time - _startTime;
+                float _speedScale = Mathf.Clamp01(_timeElapsed / _rollDuration);
+
+                _characterController.Move(_rollDirection * _movementSpeed * _dashLength * _speedScale * Time.deltaTime);
+                transform.forward = Vector3.Slerp(transform.forward, _rollDirection, Time.deltaTime * _rotationSpeed);
+
+                await UniTask.Yield();
+            }
+
+            _canRoll = false;
         }
 
         private void PlayerRotate()
@@ -104,7 +185,7 @@ namespace Gameplay.Player
                 Vector3 _direction = _target.position - transform.position;
                 _direction.y = 0;
                 Quaternion _rotation = Quaternion.LookRotation(_direction);
-                transform.rotation = Quaternion.Euler(0, _rotation.eulerAngles.y, 0);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, _rotation.eulerAngles.y, 0), Time.deltaTime);
             }
         }
 

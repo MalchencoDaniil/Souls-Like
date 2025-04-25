@@ -15,5 +15,10 @@ namespace Gameplay.Player
         {
             return InputManager._instance._inputActions.Camera.Focus.triggered;
         }
+
+        internal bool RollInputEvent()
+        {
+            return InputManager._instance._inputActions.Player.Roll.triggered;
+        }
     }
 }
