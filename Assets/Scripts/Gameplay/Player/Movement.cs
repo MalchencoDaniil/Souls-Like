@@ -20,6 +20,9 @@ namespace Gameplay.Player
         private PlayerAnimator _playerAnimator;
 
         [SerializeField]
+        private Transform _playerBody;
+
+        [SerializeField]
         private Transform _target;
 
         private Vector3 _movementDirection, _currentVelocity;
@@ -28,11 +31,20 @@ namespace Gameplay.Player
         [SerializeField, Range(5, 8)]
         private float _movementSpeed = 4;
 
+        [SerializeField, Range(1, 5)]
+        private float _walkSpeed = 2;
+
         [SerializeField]
         private float _dashLength = 2;
 
         [SerializeField]
+        private AnimationCurve _rollSpeedCurve = AnimationCurve.Linear(0, 1, 1, 1);
+
+        [SerializeField]
         private float _rotationSpeed = 15f;
+
+        [SerializeField]
+        private float _focusRotationSpeed = 3;
 
         [Header("Ground Detection")]
         public float _groundDistance = 0.1f;
@@ -101,17 +113,20 @@ namespace Gameplay.Player
                 _canRoll = false;
 
                 Vector3 _rollDirection;
+                Transform _baseTransform;
 
                 if (_canTPS)
                 {
                     _rollDirection = transform.forward;
+                    _baseTransform = transform;
                 }
                 else
                 {
                     _rollDirection = CalculateRollDirection(_movementDirection);
+                    _baseTransform = _playerBody.transform;
                 }
 
-                await Rolling(_rollDirection);
+                await Rolling(_rollDirection, _baseTransform);
             }
         }
 
@@ -137,10 +152,10 @@ namespace Gameplay.Player
         {
             PlayerRotate();
 
-            _movementSpeed = _canTPS ? _currentSpeed : _currentSpeed / 2;
+            _movementSpeed = _canTPS ? _currentSpeed : _walkSpeed;
         }
 
-        private async UniTask Rolling(Vector3 _direction)
+        private async UniTask Rolling(Vector3 _direction, Transform _transform)
         {
             _canRoll = true;
 
@@ -160,13 +175,16 @@ namespace Gameplay.Player
             while (Time.time < _startTime + _rollDuration)
             {
                 float _timeElapsed = Time.time - _startTime;
-                float _speedScale = Mathf.Clamp01(_timeElapsed / _rollDuration);
+                float _normalizedTime = _timeElapsed / _rollDuration;
+                float _speedMultiplier = _rollSpeedCurve.Evaluate(_normalizedTime);
 
-                _characterController.Move(_rollDirection * _movementSpeed * _dashLength * _speedScale * Time.deltaTime);
-                transform.forward = Vector3.Slerp(transform.forward, _rollDirection, Time.deltaTime * _rotationSpeed);
+                _characterController.Move(_rollDirection * _walkSpeed * _dashLength * _speedMultiplier * Time.deltaTime);
+                _transform.forward = Vector3.Slerp(_transform.forward, _rollDirection, Time.deltaTime * _rotationSpeed);
 
                 await UniTask.Yield();
             }
+
+            _transform.forward = transform.forward;
 
             _canRoll = false;
         }
@@ -185,7 +203,8 @@ namespace Gameplay.Player
                 Vector3 _direction = _target.position - transform.position;
                 _direction.y = 0;
                 Quaternion _rotation = Quaternion.LookRotation(_direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, _rotation.eulerAngles.y, 0), Time.deltaTime);
+
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, _rotation.eulerAngles.y, 0), _focusRotationSpeed * Time.deltaTime) ;
             }
         }
 
