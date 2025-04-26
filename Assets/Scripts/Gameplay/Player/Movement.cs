@@ -22,10 +22,12 @@ namespace Gameplay.Player
         [SerializeField]
         private Transform _playerBody;
 
-        [SerializeField]
         private Transform _target;
 
         private Vector3 _movementDirection, _currentVelocity;
+
+        [SerializeField]
+        private TargetDetection _targetDetection;
 
         [Header("Movement Stats")]
         [SerializeField, Range(5, 8)]
@@ -92,7 +94,21 @@ namespace Gameplay.Player
 
             if (!_canRoll)
             {
-                if (_playerInput.SwitchMoveType()) SwitchCamera();
+                if (_playerInput.SwitchMoveType() && !_canTPS)
+                {
+                    SwitchCamera();
+                    Debug.Log("True");
+                    return;
+                }
+
+                if (_playerInput.SwitchMoveType())
+                {
+                    _target = _targetDetection.FindClosestTarget();
+
+                    if (_target != null)
+                        SwitchCamera();
+                }
+
                 MovementType();
 
                 _characterController.Move(_movementDirection * _movementSpeed * Time.deltaTime);
@@ -123,6 +139,10 @@ namespace Gameplay.Player
                 else
                 {
                     _rollDirection = CalculateRollDirection(_movementDirection);
+
+                    if (_rollDirection.y < -0.2f)
+                        return;
+
                     _baseTransform = _playerBody.transform;
                 }
 
