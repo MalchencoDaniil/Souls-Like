@@ -1,35 +1,32 @@
 using UnityEngine;
 
-namespace Gameplay.Player
+public class PlayerGravity : MonoBehaviour
 {
-    public class PlayerGravity : MonoBehaviour
+    private Vector3 _playerVelocity;
+
+    private PlayerController _movementData;
+
+    private void Awake()
     {
-        private Vector3 _playerVelocity;
+        _movementData = GetComponent<PlayerController>();
+    }
 
-        private Movement _movement;
+    private void Update()
+    {
+        ApplyGravity();
+    }
 
-        private void Awake()
+    private void ApplyGravity()
+    {
+        if (_movementData.IsGrounded() && _playerVelocity.y < 0)
         {
-            _movement = GetComponent<Movement>();
+            _playerVelocity.y = -1;
+        }
+        else
+        {
+            _playerVelocity.y += World._instance.GRAVITY_FORCE * Time.deltaTime;
         }
 
-        private void Update()
-        {
-            ApplyGravity();
-        }
-
-        private void ApplyGravity()
-        {
-            if (_movement.IsGrounded() && _playerVelocity.y < 0)
-            {
-                _playerVelocity.y = -1;
-            }
-            else
-            {
-                _playerVelocity.y += World._instance.GRAVITY_FORCE * Time.deltaTime;
-            }
-
-            _movement._characterController.Move(_playerVelocity * Time.deltaTime);
-        }
+        _movementData._characterController.Move(_playerVelocity * Time.deltaTime);
     }
 }

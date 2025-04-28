@@ -1,24 +1,24 @@
-using System;
 using UnityEngine;
-using UnityEngine.Events;
 
-namespace Gameplay.Player
+public class PlayerInput
 {
-    public class PlayerInput
+    public bool AttackInput()
     {
-        internal Vector2 MovementInput()
-        {
-            return InputManager._instance._inputActions.Player.Movement.ReadValue<Vector2>();
-        }
+        return InputManager._instance._inputActions.Player.Attack.triggered;
+    }
 
-        internal bool SwitchMoveType()
-        {
-            return InputManager._instance._inputActions.Camera.Focus.triggered;
-        }
+    public Vector2 MovementInput()
+    {
+        return InputManager._instance._inputActions.Player.Movement.ReadValue<Vector2>();
+    }
 
-        internal bool RollInputEvent()
-        {
-            return InputManager._instance._inputActions.Player.Roll.triggered;
-        }
+    public bool FocusInput()
+    {
+        return InputManager._instance._inputActions.Camera.Focus.triggered;
+    }
+
+    public bool RollInput()
+    {
+        return InputManager._instance._inputActions.Player.Roll.triggered;
     }
 }
