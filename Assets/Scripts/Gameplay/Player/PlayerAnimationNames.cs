@@ -7,4 +7,5 @@ public static class PlayerAnimationNames
     public static string _rolling = "CanRoll";
     public static string _attackName = "Attack";
     public static string _attackIDName = "AttackID";
+    public static string _superAttackName = "SupperAttack";
 }

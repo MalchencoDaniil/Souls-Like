@@ -3,7 +3,9 @@ using Zenject;
 
 public class PlayerController : MovementData, IPlayer
 {
-    internal bool _canRoll = false;
+    internal bool _canRoll = false, _canAttack = false;
+
+    internal float _timeToAttack = 0;
 
     private StateMachine _stateMachine;
     private CameraMode _cameraMode;
@@ -13,6 +15,7 @@ public class PlayerController : MovementData, IPlayer
     private Player.PlayerRun _runState;
     private Player.PlayerRoll _rollState;
     private Player.PlayerWalk _walkState;
+    private Player.PlayerAttack _attackState;
 
     private Transform _currentTarget;
     public Transform Target => _currentTarget;
@@ -35,12 +38,19 @@ public class PlayerController : MovementData, IPlayer
     {
         _targetDetection = GetComponent<TargetDetection>();
         _cameraMode =GetComponent<CameraMode>();
+
+        InitializePlayerStates();
+
+        _stateMachine.Initialize(_idleState);
+    }
+
+    private void InitializePlayerStates()
+    {
         _idleState = GetComponent<Player.PlayerIdle>();
         _runState = GetComponent<Player.PlayerRun>();
         _rollState = GetComponent<Player.PlayerRoll>();
         _walkState = GetComponent<Player.PlayerWalk>();
-
-        _stateMachine.Initialize(_idleState);
+        _attackState = GetComponent<Player.PlayerAttack>();
     }
 
     private void Update()
@@ -53,9 +63,7 @@ public class PlayerController : MovementData, IPlayer
 
         _movementDirection = _movementInput.normalized;
 
-        StateControl();
-
-        if (!_canRoll)
+        if (!_canRoll && !_canAttack)
         {
             if (_playerInput.FocusInput() && !_cameraMode.CanTPS())
             {
@@ -70,7 +78,11 @@ public class PlayerController : MovementData, IPlayer
                 if (_currentTarget != null)
                    _cameraMode.SwitchCamera(_playerAnimator);
             }
+
+            StateControl();
         }
+
+        _timeToAttack -= Time.deltaTime;
 
         _playerAnimator.SetFloat(PlayerAnimationNames._speedName, _movementDirection.sqrMagnitude);
         //Debug.Log(_stateMachine._currentState);
@@ -78,7 +90,7 @@ public class PlayerController : MovementData, IPlayer
 
     private void StateControl()
     {
-        if (_movementDirection != Vector3.zero && !_canRoll)
+        if (_movementDirection != Vector3.zero)
         {
             Run();
 
@@ -89,14 +101,22 @@ public class PlayerController : MovementData, IPlayer
                 Walk();
         }
 
-        if (_playerInput.RollInput() && IsGrounded() && !_canRoll)
+        if (_playerInput.RollInput() && IsGrounded())
         {
             Roll();
         }
 
-        if (_movementDirection == Vector3.zero && !_canRoll)
+        if (_movementDirection == Vector3.zero)
         {
             Idle();
+        }
+
+        if (_timeToAttack <= 0 && _playerInput.AttackInput())
+        {
+            Attack();
+
+            Vector3 _direction = _cameraMode.CanTPS() ? _movementDirection : transform.forward;
+            transform.forward = _cameraMode.CanTPS() ? Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * Vector3.forward :  _direction.normalized;
         }
     }
 
@@ -105,28 +125,9 @@ public class PlayerController : MovementData, IPlayer
         return Physics.CheckSphere(new Vector3(transform.position.x, transform.position.y + (_characterController.height / 2) * -1, transform.position.z), _groundDistance, _whatIsGround);
     }
 
-    public void Attack()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void Idle()
-    {
-        _stateMachine.ChangeState(_idleState);
-    }
-
-    public void Roll()
-    {
-        _stateMachine.ChangeState(_rollState);
-    }
-
-    public void Walk()
-    {
-        _stateMachine.ChangeState(_walkState);
-    }
-
-    public void Run()
-    {
-        _stateMachine.ChangeState(_runState);;
-    }
+    public void Attack() => _stateMachine.ChangeState(_attackState);
+    public void Idle() => _stateMachine.ChangeState(_idleState);
+    public void Roll() => _stateMachine.ChangeState(_rollState);
+    public void Walk() => _stateMachine.ChangeState(_walkState);
+    public void Run() => _stateMachine.ChangeState(_runState);
 }

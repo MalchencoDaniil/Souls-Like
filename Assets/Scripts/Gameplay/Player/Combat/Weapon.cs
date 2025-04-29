@@ -8,6 +8,8 @@ public abstract class Weapon : MonoBehaviour
 
     public int _attackAnimCount = 1;
 
+    public AnimationClip[] _attackClips;
+
     public virtual void Equip(Transform hand) { }
     public virtual void Unequip() { }
 
