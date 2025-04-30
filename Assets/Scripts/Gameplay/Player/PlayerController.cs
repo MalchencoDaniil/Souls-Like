@@ -16,6 +16,7 @@ public class PlayerController : MovementData, IPlayer
     private Player.PlayerRoll _rollState;
     private Player.PlayerWalk _walkState;
     private Player.PlayerAttack _attackState;
+    private Player.PlayerSuperAttack _superAttackState;
 
     private Transform _currentTarget;
     public Transform Target => _currentTarget;
@@ -47,6 +48,7 @@ public class PlayerController : MovementData, IPlayer
     private void InitializePlayerStates()
     {
         _idleState = GetComponent<Player.PlayerIdle>();
+        _superAttackState = GetComponent<Player.PlayerSuperAttack>();
         _runState = GetComponent<Player.PlayerRun>();
         _rollState = GetComponent<Player.PlayerRoll>();
         _walkState = GetComponent<Player.PlayerWalk>();
@@ -114,10 +116,12 @@ public class PlayerController : MovementData, IPlayer
         if (_timeToAttack <= 0 && _playerInput.AttackInput())
         {
             Attack();
-
-            Vector3 _direction = _cameraMode.CanTPS() ? _movementDirection : transform.forward;
-            transform.forward = _cameraMode.CanTPS() ? Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * Vector3.forward :  _direction.normalized;
+            
+            transform.forward = _cameraMode.CanTPS() ? Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * Vector3.forward : transform.forward;
         }
+
+        //if (_playerInput.SupperAttackInput() && _timeToAttack <= 0)
+        //    SupperAttack();
     }
 
     internal override bool IsGrounded()
@@ -126,6 +130,7 @@ public class PlayerController : MovementData, IPlayer
     }
 
     public void Attack() => _stateMachine.ChangeState(_attackState);
+    private void SupperAttack() => _stateMachine.ChangeState(_superAttackState);
     public void Idle() => _stateMachine.ChangeState(_idleState);
     public void Roll() => _stateMachine.ChangeState(_rollState);
     public void Walk() => _stateMachine.ChangeState(_walkState);

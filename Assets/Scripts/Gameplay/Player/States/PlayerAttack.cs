@@ -58,7 +58,7 @@ namespace Player
 
         private float CheckCurrentAnimId(float _id)
         {
-            if (_currentAnimId >= _combatSystem.CurrentWeapon._attackAnimCount)
+            if (_currentAnimId >= _combatSystem.CurrentWeapon._attackClips.Length)
                 return 0;
 
             if (_currentAnimId < 0)

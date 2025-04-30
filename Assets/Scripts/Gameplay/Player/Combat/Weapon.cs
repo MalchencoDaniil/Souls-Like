@@ -6,8 +6,6 @@ public abstract class Weapon : MonoBehaviour
     public float _attackRange = 3;
     public float _reloadTime = 1;
 
-    public int _attackAnimCount = 1;
-
     public AnimationClip[] _attackClips;
 
     public virtual void Equip(Transform hand) { }

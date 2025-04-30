@@ -4,8 +4,14 @@ public class PlayerInput
 {
     public bool AttackInput()
     {
-        return InputManager._instance._inputActions.Player.Attack.triggered;
+        return InputManager._instance._inputActions.Player.Attack.triggered && !SupperAttackInput();
     }
+
+    public bool SupperAttackInput()
+    {
+        return InputManager._instance._inputActions.Player.Super.IsPressed() && InputManager._instance._inputActions.Player.Attack.IsPressed();
+    }
+
 
     public Vector2 MovementInput()
     {
