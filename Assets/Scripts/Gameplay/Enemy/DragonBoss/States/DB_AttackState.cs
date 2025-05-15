@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DB_AttackState : State
@@ -13,12 +14,24 @@ public class DB_AttackState : State
     [SerializeField]
     private float _rotationSpeed = 15f;
 
+    [SerializeField]
+    private float _attackRange = 2;
+
+    [SerializeField]
+    private LayerMask _playerLayer;
+
+    [SerializeField]
+    private float _attackDamage = 20;
+
     [Space(15)]
     [SerializeField]
     private AnimationClip[] _attackClips;
 
     [SerializeField]
     private Vector3 _attackOffset;
+
+    [SerializeField]
+    private List<Transform> _attackPoints;
 
     private void Awake()
     {
@@ -36,13 +49,18 @@ public class DB_AttackState : State
         _enemyAnimator.SetTrigger(PlayerAnimationNames._attackName);
         _enemyAnimator.SetFloat(PlayerAnimationNames._attackIDName, _currentAnimId);
 
-        Vector3 _direction = _enemy._target.position + _attackOffset - transform.position;
-        _direction.y = 0;
+        float _waitingTime = Time.time + 2;
 
-        Quaternion targetRotation = Quaternion.LookRotation(_direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+        while (Time.time < _waitingTime)
+        {
+            Vector3 _direction = _enemy._target.position + _attackOffset - transform.position;
+            _direction.y = 0;
 
-        await UniTask.WaitForSeconds(2);
+            Quaternion _targetRotation = Quaternion.LookRotation(_direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, _targetRotation, _rotationSpeed * Time.deltaTime);
+
+            await UniTask.Yield();
+        }
 
         _enemy._timeToAttack = _reloadAttackTime;
 
@@ -63,8 +81,27 @@ public class DB_AttackState : State
         return _currentAnimId;
     }
 
-
     public override void Exit() { }
 
     public override void UpdateState() { }
+
+    public void CheckHit()
+    {
+        Debug.Log("CheckHit");
+
+        foreach (Transform attackPoint in _attackPoints)
+        {
+            Collider[] _hitEnemys = Physics.OverlapSphere(attackPoint.position, _attackRange, _playerLayer);
+
+            foreach (Collider _enemyCollider in _hitEnemys)
+            {
+                HealthSystem _player = _enemyCollider.gameObject.GetComponent<HealthSystem>();
+
+                if (_player != null)
+                {
+                    _player.TakeDamage(_attackDamage);
+                }
+            }
+        }
+    }
 }

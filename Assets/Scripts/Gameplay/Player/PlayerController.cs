@@ -10,6 +10,7 @@ public class PlayerController : MovementData, IPlayer
     private StateMachine _stateMachine;
     private CameraMode _cameraMode;
     private TargetDetection _targetDetection;
+    private PlayerSystems _playerSystems;
 
     private Player.PlayerIdle _idleState;
     private Player.PlayerRun _runState;
@@ -37,6 +38,7 @@ public class PlayerController : MovementData, IPlayer
 
     private void Start()
     {
+        _playerSystems = GetComponent<PlayerSystems>();
         _targetDetection = GetComponent<TargetDetection>();
         _cameraMode =GetComponent<CameraMode>();
 
@@ -84,10 +86,12 @@ public class PlayerController : MovementData, IPlayer
             StateControl();
         }
 
+        if (!_canAttack && !_canRoll)
+            _playerSystems.AddStamina(0.05f);
+
         _timeToAttack -= Time.deltaTime;
 
         _playerAnimator.SetFloat(PlayerAnimationNames._speedName, _movementDirection.sqrMagnitude);
-        //Debug.Log(_stateMachine._currentState);
     }
 
     private void StateControl()
@@ -103,8 +107,9 @@ public class PlayerController : MovementData, IPlayer
                 Walk();
         }
 
-        if (_playerInput.RollInput() && IsGrounded())
+        if (_playerInput.RollInput() && IsGrounded() && _playerSystems.CurrentStamina >= 10)
         {
+            _playerSystems.TakeStamina(10);
             Roll();
         }
 
@@ -113,8 +118,10 @@ public class PlayerController : MovementData, IPlayer
             Idle();
         }
 
-        if (_timeToAttack <= 0 && _playerInput.AttackInput())
+        if (_timeToAttack <= 0 && _playerInput.AttackInput() && _playerSystems.CurrentStamina >= 10)
         {
+            _playerSystems.TakeStamina(10);
+
             Attack();
             
             transform.forward = _cameraMode.CanTPS() ? Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * Vector3.forward : transform.forward;
